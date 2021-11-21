@@ -10,7 +10,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func CreateBlog(w http.ResponseWriter, r *http.Request) {
+func CreateBlog(w http.ResponseWriter, r *http.Request, userID int) {
 	databytes, err := ioutil.ReadAll(r.Body) // read the body of the request from the client to the server and store it in the variable databytes
 	if err != nil {
 		panic(err)
@@ -26,7 +26,7 @@ func CreateBlog(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(blog)
 }
 
-func GetAllBlogs(w http.ResponseWriter, r *http.Request) {
+func GetAllBlogs(w http.ResponseWriter, r *http.Request, userID int) {
 	var blogs *[]models.Blog
 	blogs, err := models.GetAllBlogs(blogs)
 	if err != nil {
@@ -37,7 +37,7 @@ func GetAllBlogs(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(blogs)
 }
 
-func GetBlog(w http.ResponseWriter, r *http.Request) {
+func GetBlog(w http.ResponseWriter, r *http.Request, userID int) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		panic(err)
@@ -57,7 +57,7 @@ func GetBlog(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func DeleteBlog(w http.ResponseWriter, r *http.Request) {
+func DeleteBlog(w http.ResponseWriter, r *http.Request, userID int) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		panic(err)
@@ -72,7 +72,7 @@ func DeleteBlog(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func UpdateBlog(w http.ResponseWriter, r *http.Request) {
+func UpdateBlog(w http.ResponseWriter, r *http.Request, userID int) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		panic(err)

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -19,6 +20,12 @@ type User struct {
 }
 
 func CreateUser(user *User) (*User, error) {
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
+	if err != nil {
+		return nil, err
+	}
+	user.Password = string(hashedPassword)
 	db := db.Create(&user)
 	fmt.Println("Rows Added", db.RowsAffected)
 	return user, db.Error
@@ -55,4 +62,22 @@ func UpdateUser(id int, fieldsToBeUpdated map[string]interface{}, user *User) (*
 	fmt.Println("Rows Updated", db.RowsAffected)
 	fmt.Println("New Data", user)
 	return user, db.Error
+}
+
+func AuthenticateUser(email, password string) (bool, *User) {
+	var user *User
+	db := db.Where("email = ?", email).First(&user)
+	if db.Error != nil {
+		fmt.Println(db.Error)
+		return false, user
+	}
+	if user.ID == 0 {
+		return false, user
+	}
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		fmt.Println(err.Error())
+		return false, user
+	}
+	return true, user
 }
